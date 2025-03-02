@@ -5,11 +5,9 @@ import FarmCollector.model.entities.Farm;
 import FarmCollector.repositories.FarmRepository;
 import FarmCollector.services.FarmService;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.transaction.Transactional;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.Mock;
-import org.mockito.Mockito;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -34,7 +32,7 @@ public class FarmControllerTest {
     private FarmService farmService;
 
     @BeforeEach
-    void setUp(){
+    void setUp() {
         farmRepository.deleteAll();
     }
 
@@ -49,25 +47,17 @@ public class FarmControllerTest {
         farmDto.setAmountExpected(50d);
 
         mockMvc.perform(post("/farms")
-                .contentType(MediaType.APPLICATION_JSON)
-                .content(new ObjectMapper().writeValueAsString(farmDto)))
+                        .contentType(MediaType.APPLICATION_JSON)
+                        .content(new ObjectMapper().writeValueAsString(farmDto)))
                 .andExpect(status().isCreated());
     }
 
     @Test
     void testGetById() throws Exception {
-        Farm farm = new Farm();
-        farm.setName("John's Farm");
-        farm.setSeason(DRY_SEASON);
-        farm.setCropType("Tuber");
-        farm.setYear(2025);
-        farm.setPlantingArea(100d);
-        farm.setAmountExpected(50d);
-
-        Farm save = farmRepository.save(farm);
+        Farm save = createFarmRecord();
 
         mockMvc.perform(get("/farms/" + save.getId())
-                .contentType(MediaType.APPLICATION_JSON))
+                        .contentType(MediaType.APPLICATION_JSON))
                 .andExpect(status().isOk());
     }
 
@@ -87,6 +77,23 @@ public class FarmControllerTest {
 
     @Test
     void testUpdateFarm() throws Exception {
+        Farm save = createFarmRecord();
+
+        mockMvc.perform(put("/farms/" + save.getId() + "?actualAmount=25")
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testGetReport() throws Exception {
+        Farm save = createFarmRecord();
+
+        mockMvc.perform(get("/farms/report?farmName=" + save.getName())
+                        .contentType(MediaType.APPLICATION_JSON))
+                .andExpect(status().isOk());
+    }
+
+    private Farm createFarmRecord() {
         Farm farm = new Farm();
         farm.setName("John's Farm");
         farm.setSeason(DRY_SEASON);
@@ -95,10 +102,6 @@ public class FarmControllerTest {
         farm.setPlantingArea(100d);
         farm.setAmountExpected(50d);
 
-        Farm save = farmRepository.save(farm);
-
-        mockMvc.perform(put("/farms/" + save.getId() + "?actualAmount=25" )
-                        .contentType(MediaType.APPLICATION_JSON))
-                .andExpect(status().isOk());
+        return farmRepository.save(farm);
     }
 }

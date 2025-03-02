@@ -17,7 +17,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/farms")
-//@RequiredArgsConstructor
 public class FarmController {
 
     private final FarmService farmService;

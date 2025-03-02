@@ -14,19 +14,19 @@ public class FarmReportDto {
         this.expectedAmount = expectedAmount;
         this.actualAmount = actualAmount;
     }
-    public double getExpectedAmount() {
+    public Double getExpectedAmount() {
         return expectedAmount;
     }
 
-    public void setExpectedAmount(double expectedAmount) {
+    public void setExpectedAmount(Double expectedAmount) {
         this.expectedAmount = expectedAmount;
     }
 
-    public double getActualAmount() {
+    public Double getActualAmount() {
         return actualAmount;
     }
 
-    public void setActualAmount(double actualAmount) {
+    public void setActualAmount(Double actualAmount) {
         this.actualAmount = actualAmount;
     }
 }
