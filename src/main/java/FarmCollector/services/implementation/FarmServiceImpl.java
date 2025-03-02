@@ -1,14 +1,18 @@
 package FarmCollector.services.implementation;
 
 import FarmCollector.dtos.FarmDto;
+import FarmCollector.dtos.FarmReportDto;
 import FarmCollector.model.entities.Farm;
 import FarmCollector.repositories.FarmRepository;
 import FarmCollector.services.FarmService;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 //@RequiredArgsConstructor
@@ -38,6 +42,10 @@ public class FarmServiceImpl implements FarmService {
     @Override
     public Farm saveFarmRecord(FarmDto farmDto) {
 
+        if (farmRepository.existsByNameAndSeason(farmDto.getName(), farmDto.getSeason())) {
+            throw new RuntimeException("Farm with name " + farmDto.getName() + " already exists");
+        }
+
         Farm farm = new Farm();
         farm.setName(farmDto.getName());
         farm.setYear(farmDto.getYear());
@@ -60,5 +68,16 @@ public class FarmServiceImpl implements FarmService {
         farm.setActualAmount(actualAmount);
 
         return farmRepository.save(farm);
+    }
+
+    @Override
+    public Page<FarmReportDto> getFarmReport(String farmName, Pageable pageable) {
+        Page<Farm> farms = farmRepository.findByName(farmName, pageable);
+
+        List<FarmReportDto> reportDtos = farms.getContent().stream()
+                .map(farm -> new FarmReportDto(farm.getAmountExpected(), farm.getActualAmount()))
+                .collect(Collectors.toList());
+
+        return new PageImpl<>(reportDtos, pageable, farms.getTotalElements());
     }
 }

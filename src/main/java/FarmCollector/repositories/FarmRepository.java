@@ -13,4 +13,6 @@ public interface FarmRepository extends JpaRepository<Farm, Long> {
     Page<Farm> findByName(String name, Pageable pageable);
 
     Optional<Farm> findByNameAndSeasonAndYear(String name, Season season, Integer year);
+
+    boolean existsByNameAndSeason(String name, Season season);
 }

@@ -2,10 +2,13 @@ package FarmCollector.controller;
 
 
 import FarmCollector.dtos.FarmDto;
+import FarmCollector.dtos.FarmReportDto;
 import FarmCollector.model.entities.Farm;
 import FarmCollector.services.FarmService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -48,6 +51,18 @@ public class FarmController {
     public ResponseEntity<Farm> updateFarm(@PathVariable Long id, @RequestParam Double actualAmount) {
         Farm updatedFarm = farmService.updateFarmRecord(id, actualAmount);
         return ResponseEntity.status(HttpStatus.OK).body(updatedFarm);
+    }
+
+    @GetMapping("/report")
+    public ResponseEntity<Page<FarmReportDto>> getFarmReport(
+            @RequestParam String farmName,
+            @RequestParam(defaultValue = "0") int pageNo,
+            @RequestParam(defaultValue = "10") int pageSize) {
+
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<FarmReportDto> report = farmService.getFarmReport(farmName, pageable);
+
+        return ResponseEntity.status(HttpStatus.OK).body(report);
     }
 }
 
